@@ -29,6 +29,8 @@ const pacscan = require('../src/pacscan')
 const version = require('../package.json').version
 
 describe('pacscan', () => {
+  // TODO: Add tests for when "path" targets unpackaged directory
+
   before(() => {
     return Promise.all([
       helpers.copyFixture('flat'),

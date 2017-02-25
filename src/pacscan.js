@@ -30,8 +30,6 @@ const whoIsThere = require('knockknock')
 
 const version = require('../package.json').version
 
-// TODO: Add JSDoc
-
 /**
  * A cache containing the available <code>package.json</code> file paths mapped to directory paths.
  *
@@ -53,6 +51,21 @@ const availablePackagesCache = new Map()
  */
 class PacScan {
 
+  /**
+   * Asynchronously finds all files that match the specified <code>patterns</code> using the glob <code>options</code>
+   * provided and passes the paths of these files to the <code>callback</code> function.
+   *
+   * This method returns a <code>Promise</code> chained using the <code>callback</code> function so that it can be
+   * returned by {@link PacScan#scan}.
+   *
+   * @param {string[]} patterns - the glob patterns to be used to target <code>package.json</code> files
+   * @param {Object} options - the glob options to be used
+   * @param {pacscan~PackagePathsCallback} callback - the function to be called with the <code>package.json</code> file
+   * paths
+   * @return {Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   * @static
+   */
   static _findPackagePaths(patterns, options, callback) {
     const searches = patterns.map((pattern) => new Promise((resolve, reject) => {
       glob(pattern, options, (error, filePaths) => {
@@ -77,6 +90,21 @@ class PacScan {
       .then(callback)
   }
 
+  /**
+   * Synchronously finds all files that match the specified <code>patterns</code> using the glob <code>options</code>
+   * provided and passes the paths of these files to the <code>callback</code> function.
+   *
+   * This method returns the return value of the <code>callback</code> function so that it can be returned by
+   * {@link PacScan#scan}.
+   *
+   * @param {string[]} patterns - the glob patterns to be used to target <code>package.json</code> files
+   * @param {Object} options - the glob options to be used
+   * @param {pacscan~PackagePathsCallback} callback - the function to be called with the <code>package.json</code> file
+   * paths
+   * @return {pacscan~Package[]} The result of calling <code>callback</code>.
+   * @private
+   * @static
+   */
   static _findPackagePathsSync(patterns, options, callback) {
     let filePaths = []
     patterns.forEach((pattern) => {
@@ -163,22 +191,46 @@ class PacScan {
     this._options = PacScan._parseOptions(options)
   }
 
+  /**
+   * Searches for all available packages within the base directory and returns a summary of the information for these
+   * packages.
+   *
+   * This method will directly return the information for all available packages if this {@link PacScan} is synchronous.
+   * Otherwise, this method will return a <code>Promise</code> which will be resolved with the information for all
+   * available packages once they have been found.
+   *
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The information for all available packages (or a
+   * <code>Promise</code> resolved with them when asynchronous).
+   * @public
+   */
   scan() {
     return this._resolveBaseDirectory((dirPath) => {
-      const packages = new Set()
+      debug('Scanning for available packages within directory: %s', dirPath)
 
       return this._findAvailablePackagePaths(dirPath, (filePaths) => {
-        filePaths.forEach((filePath) => {
+        debug('Found %d available packages within directory: %s', filePaths.length, dirPath)
+
+        return filePaths.map((filePath) => {
           const pkg = PacScan._getPackage(path.dirname(filePath))
 
-          packages.add(Object.assign({}, pkg))
+          return Object.assign({}, pkg)
         })
-
-        return Array.from(packages)
       })
     })
   }
 
+  /**
+   * Finds all <code>package.json</code> files that are available within the directory provided and passes the paths of
+   * these files to the <code>callback</code> function.
+   *
+   * The flow for this method differs based on whether this {@link PacScan} is synchronous.
+   *
+   * @param {string} dirPath - the path to the directory to be searched
+   * @param {pacscan~PackagePathsCallback} callback - the function to be called with the <code>package.json</code> file
+   * paths
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
   _findAvailablePackagePaths(dirPath, callback) {
     if (availablePackagesCache.has(dirPath)) {
       return callback(availablePackagesCache.get(dirPath))
@@ -210,6 +262,21 @@ class PacScan {
     }))
   }
 
+  /**
+   * Finds the base directory from the specified <code>filePath</code> and passes the path to the base directory to the
+   * <code>callback</code> function.
+   *
+   * The base directory is basically the highest level package directory. This is determined by finding package
+   * directories and climbing the <code>node_modules</code> directories until it can't anymore. At that point, the base
+   * directory is found.
+   *
+   * This method should only be called when the <code>includeParents</code> option is enabled.
+   *
+   * @param {string} filePath - the file path from where the base directory should be found
+   * @param {pacscan~BaseDirectoryCallback} callback - the function to be called with the path to the base directory
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
   _findBaseDirectory(filePath, callback) {
     return this._findPackageDirectory(filePath, (dirPath) => {
       if (dirPath == null) {
@@ -238,6 +305,47 @@ class PacScan {
     })
   }
 
+  /**
+   * Finds the information for module that was responsible for calling PacScan and passes it to the
+   * <code>callback</code> function.
+   *
+   * Consumers can control what modules/packages are considering during this search via the <code>knockknock</code>
+   * option, however, the <code>limit</code> will always be overridden to <code>1</code>.
+   *
+   * The flow for this method differs based on whether this {@link PacScan} is synchronous.
+   *
+   * @param {pacscan~FindCallerCallback} callback - the function to be called with the caller information
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>
+   * @private
+   */
+  _findCaller(callback) {
+    const excludes = [ 'pacscan' ]
+    const options = Object.assign({}, this._options.knockknock, { limit: 1 })
+
+    options.excludes = options.excludes ? excludes.concat(options.excludes) : excludes
+
+    if (this._sync) {
+      return callback(whoIsThere.sync(options)[0])
+    }
+
+    return whoIsThere(options)
+      .then((callers) => callers[0])
+      .then(callback)
+  }
+
+  /**
+   * Finds the installation directory for the package containing the specified <code>filePath</code> and passes the
+   * directory path to the <code>callback</code> function.
+   *
+   * If <code>filePath</code> does not exist within a package, the directory path will be <code>null</code>.
+   *
+   * The flow for this method differs based on whether this {@link PacScan} is synchronous.
+   *
+   * @param {string} filePath - the path of the file whose package directory is to be found
+   * @param {pacscan~FindPackageDirectoryCallback} callback - the function to be called with the package directory path
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
   _findPackageDirectory(filePath, callback) {
     if (this._sync) {
       return callback(pkgDir.sync(filePath))
@@ -246,35 +354,46 @@ class PacScan {
     return pkgDir(filePath).then(callback)
   }
 
-  _getCallers(callback) {
-    const options = Object.assign({}, this._options.knockknock, { limit: 1 })
-
-    if (options.excludes) {
-      options.excludes = [ 'pacscan' ].concat(options.excludes)
-    } else {
-      options.excludes = [ 'pacscan' ]
-    }
-
-    if (this._sync) {
-      return callback(whoIsThere.sync(options))
-    }
-
-    return whoIsThere(options).then(callback)
-  }
-
+  /**
+   * Determines whether the specified <code>filePath</code> is a package installation directory and passes the result
+   * to the <code>callback</code> function.
+   *
+   * @param {string} filePath - the path of the fiile to be checked
+   * @param {pacscan~IsPackageDirectoryCallback} callback - the function to be called with the result
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
   _isPackageDirectory(filePath, callback) {
     return this._findPackageDirectory(filePath, (dirPath) => callback(filePath === dirPath))
   }
 
+  /**
+   * Resolves the base directory from where the package scan should originate and passes the directory path to the
+   * <code>callback</code> function.
+   *
+   * If the <code>path</code> option is specified, it is treated as the base file (even if it's not a file). Otherwise,
+   * the module that was responsible for calling PacScan is found and will be treated as the base file instead.
+   *
+   * If the base file belongs to a package, its directory will be used in the next step. Otherwise, the directory of the
+   * base file is used instead.
+   *
+   * At this stage, we have a base directory, however, if the <code>includeParents</code> option is enabled, the
+   * dependency tree (based on directory structure, not <code>package.json</code>) is climbed to find the highest level
+   * base directory, where possible.
+   *
+   * @param {pacscan~BaseDirectoryCallback} callback - the function to be called with the base directory path
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
   _resolveBaseDirectory(callback) {
-    let baseDirectoryResolver
+    let packageResolver
     if (this._options.path != null) {
-      baseDirectoryResolver = this._resolveBaseDirectoryFromPath.bind(this)
+      packageResolver = this._resolvePackageFromPath.bind(this)
     } else {
-      baseDirectoryResolver = this._resolveBaseDirectoryFromCaller.bind(this)
+      packageResolver = this._resolvePackageFromCaller.bind(this)
     }
 
-    return baseDirectoryResolver((filePath, pkg) => {
+    return packageResolver((filePath, pkg) => {
       if (filePath == null) {
         throw new Error('Could not resolve base directory as file was missing')
       }
@@ -303,18 +422,40 @@ class PacScan {
     })
   }
 
-  _resolveBaseDirectoryFromCaller(callback) {
-    return this._getCallers((callers) => {
-      const caller = callers[0]
-      if (caller != null) {
-        return callback(caller.file, caller.package)
+  /**
+   * Resolves the package from the module that was responsible for calling PacScan and passes the module file path and
+   * package information to the <code>callback</code> function.
+   *
+   * If no caller information could be found, both the file path and package information will be <code>null</code> or,
+   * if the calling module does not belong to a package, only the package information will be <code>null</code>.
+   *
+   * @param {pacscan~ResolvePackageCallback} callback - the function to be called with the file path and package
+   * information derived from the calling module
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
+  _resolvePackageFromCaller(callback) {
+    return this._findCaller((caller) => {
+      if (caller == null) {
+        return callback(null, null)
       }
 
-      return callback(null, null)
+      return callback(caller.file, caller.package)
     })
   }
 
-  _resolveBaseDirectoryFromPath(callback) {
+  /**
+   * Resolves the package from the <code>path</code> option and passes the <code>path</code> option and package
+   * information to the <code>callback</code> function.
+   *
+   * If the <code>path</code> option does not belong to a package, the package information will be <code>null</code>.
+   *
+   * @param {pacscan~ResolvePackageCallback} callback - the function to be called with the <code>path</code> option and
+   * package information
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
+  _resolvePackageFromPath(callback) {
     const filePath = this._options.path
 
     return this._findPackageDirectory(filePath, (dirPath) => {
@@ -326,6 +467,23 @@ class PacScan {
 
 }
 
+/**
+ * Asynchronously resolves the base directory from either the <code>path</code> option or the module that was
+ * responsible for calling PacScan and then scans this directory for all packages available within it.
+ *
+ * The scan can also include packages from parent packages (for cases where the target module exists within a depedent
+ * package - e.g. exists within another package's <code>node_modules</code> directory) by enabling the
+ * <code>includeParents</code> option.
+ *
+ * The resolution of the calling module can be controlled at a more granular level by specifying <code>knockknock</code>
+ * options.
+ *
+ * @param {pacscan~Options} [options] - the options to be used (may be <code>null</code>)
+ * @return {Promise.<Error, pacscan~Package[]>} A <code>Promise</code> for retrieving the information for all available
+ * packages.
+ * @public
+ * @static
+ */
 module.exports = function scan(options) {
   return Promise.resolve(new PacScan(false, options).scan())
 }
@@ -344,6 +502,22 @@ module.exports.clearCache = function clearCache() {
   availablePackagesCache.clear()
 }
 
+/**
+ * Synchronously resolves the base directory from either the <code>path</code> option or the module that was responsible
+ * for calling PacScan and then scans this directory for all packages available within it.
+ *
+ * The scan can also include packages from parent packages (for cases where the target module exists within a depedent
+ * package - e.g. exists within another package's <code>node_modules</code> directory) by enabling the
+ * <code>includeParents</code> option.
+ *
+ * The resolution of the calling module can be controlled at a more granular level by specifying <code>knockknock</code>
+ * options.
+ *
+ * @param {pacscan~Options} [options] - the options to be used (may be <code>null</code>)
+ * @return {pacscan~Package[]} The information for all available packages.
+ * @public
+ * @static
+ */
 module.exports.sync = function scanSync(options) {
   return new PacScan(true, options).scan()
 }
@@ -356,6 +530,55 @@ module.exports.sync = function scanSync(options) {
  * @type {string}
  */
 module.exports.version = version
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~BaseDirectoryCallback
+ * @param {?string} dirPath -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~FindCallerCallback
+ * @param {?knockknock~Caller} caller -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~FindPackageDirectoryCallback
+ * @param {?string} dirPath -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~IsPackageDirectoryCallback
+ * @param {boolean} isPackage -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~PackagePathsCallback
+ * @param {string[]} filePaths -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~ResolvePackageCallback
+ * @param {?string} filePath -
+ * @param {?pacscan~Package} pkg -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
 
 /**
  * Contains some basic information for an individual package.
