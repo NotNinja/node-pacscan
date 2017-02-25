@@ -23,6 +23,7 @@
 'use strict'
 
 const debug = require('debug')('pacscan')
+const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
 const pkgDir = require('pkg-dir')
@@ -355,6 +356,33 @@ class PacScan {
   }
 
   /**
+   * Determines whether the specified <code>filePath</code> is a directory and passes the result to the
+   * <code>callback</code> function.
+   *
+   * @param {string} filePath - the path of the file to be checked
+   * @param {pacscan~IsDirectoryCallback} callback - the function to be called with the result
+   * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
+   * @private
+   */
+  _isDirectory(filePath, callback) {
+    if (this._sync) {
+      return callback(fs.statSync(filePath).isDirectory())
+    }
+
+    return new Promise((resolve, reject) => {
+      fs.stat(filePath, (error, stats) => {
+        /* istanbul ignore if */
+        if (error) {
+          reject(error)
+        } else {
+          resolve(stats.isDirectory())
+        }
+      })
+    })
+    .then(callback)
+  }
+
+  /**
    * Determines whether the specified <code>filePath</code> is a package installation directory and passes the result
    * to the <code>callback</code> function.
    *
@@ -399,11 +427,13 @@ class PacScan {
       }
 
       if (pkg == null) {
-        const dirPath = path.dirname(filePath)
+        return this._isDirectory(filePath, (isDirectory) => {
+          const dirPath = isDirectory ? filePath : path.dirname(filePath)
 
-        debug('Unable to find package containing file "%s" so using parent directory as base: %s', filePath, dirPath)
+          debug('Unable to find package containing file "%s" so using directory as base: %s', filePath, dirPath)
 
-        return callback(dirPath)
+          return callback(dirPath)
+        })
       }
 
       const dirPath = pkg.directory
@@ -552,6 +582,14 @@ module.exports.version = version
  *
  * @callback pacscan~FindPackageDirectoryCallback
  * @param {?string} dirPath -
+ * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
+ */
+
+/**
+ * TODO: Document
+ *
+ * @callback pacscan~IsDirectoryCallback
+ * @param {boolean} isDirectory -
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 

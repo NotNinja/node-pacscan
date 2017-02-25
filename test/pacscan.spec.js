@@ -29,8 +29,6 @@ const pacscan = require('../src/pacscan')
 const version = require('../package.json').version
 
 describe('pacscan', () => {
-  // TODO: Add tests for when "path" targets unpackaged directory
-
   before(() => {
     return Promise.all([
       helpers.copyFixture('flat'),
@@ -165,6 +163,30 @@ describe('pacscan', () => {
                 main: 'flat/index.js',
                 name: 'flat',
                 version: '1.0.0'
+              })
+            ])
+          })
+      })
+    })
+
+    context('and "path" targets unpackaged directory', () => {
+      it('should return promise for dependencies only', () => {
+        const dirPath = helpers.getFixtureDirectory('unpackaged')
+
+        return pacscan(helpers.createOptions({ path: dirPath }))
+          .then((packages) => {
+            expect(packages).to.eql([
+              helpers.resolvePackageForFixture({
+                directory: 'unpackaged/node_modules/foo/node_modules/bar',
+                main: 'unpackaged/node_modules/foo/node_modules/bar/index',
+                name: 'bar',
+                version: '1.2.0'
+              }),
+              helpers.resolvePackageForFixture({
+                directory: 'unpackaged/node_modules/foo',
+                main: 'unpackaged/node_modules/foo/index.js',
+                name: 'foo',
+                version: '1.1.0'
               })
             ])
           })
@@ -315,6 +337,28 @@ describe('pacscan', () => {
             main: 'flat/index.js',
             name: 'flat',
             version: '1.0.0'
+          })
+        ])
+      })
+    })
+
+    context('and "path" targets unpackaged directory', () => {
+      it('should return dependencies only', () => {
+        const dirPath = helpers.getFixtureDirectory('unpackaged')
+        const packages = pacscan.sync(helpers.createOptions({ path: dirPath }))
+
+        expect(packages).to.eql([
+          helpers.resolvePackageForFixture({
+            directory: 'unpackaged/node_modules/foo/node_modules/bar',
+            main: 'unpackaged/node_modules/foo/node_modules/bar/index',
+            name: 'bar',
+            version: '1.2.0'
+          }),
+          helpers.resolvePackageForFixture({
+            directory: 'unpackaged/node_modules/foo',
+            main: 'unpackaged/node_modules/foo/index.js',
+            name: 'foo',
+            version: '1.1.0'
           })
         ])
       })
