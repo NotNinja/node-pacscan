@@ -30,8 +30,10 @@ const version = require('../package.json').version
 
 describe('pacscan', () => {
   before(() => {
-    return helpers.copyFixture('flat')
-      .then(() => helpers.copyFixture('unpackaged'))
+    return Promise.all([
+      helpers.copyFixture('flat'),
+      helpers.copyFixture('unpackaged')
+    ])
   })
 
   context('when asynchronous', () => {
