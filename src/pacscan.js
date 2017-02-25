@@ -562,59 +562,62 @@ module.exports.sync = function scanSync(options) {
 module.exports.version = version
 
 /**
- * TODO: Document
+ * Called with the path of a base directory.
  *
  * @callback pacscan~BaseDirectoryCallback
- * @param {?string} dirPath -
+ * @param {?string} dirPath - the path to the base directory (may be <code>null</code> if none could be found)
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with the information for the caller that was responsible for calling PacScan.
  *
  * @callback pacscan~FindCallerCallback
- * @param {?knockknock~Caller} caller -
+ * @param {?knockknock~Caller} caller - the caller information (may be <code>null</code> if no caller could be found)
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with the path to the package installation directory containing a file.
  *
  * @callback pacscan~FindPackageDirectoryCallback
- * @param {?string} dirPath -
+ * @param {?string} dirPath - the path to the package installation directory (may be <code>null</code> if the file does
+ * not belong to a package)
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with whether a file path points to an existing directory.
  *
  * @callback pacscan~IsDirectoryCallback
- * @param {boolean} isDirectory -
+ * @param {boolean} isDirectory - <code>true</code> if the file path points to a directory; otherwise <code>false</code>
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with whether a file path points to a package installation directory.
  *
  * @callback pacscan~IsPackageDirectoryCallback
- * @param {boolean} isPackage -
+ * @param {boolean} isPackage - <code>true</code> if the file path points to a pacakge installation directory; otherwise
+ * <code>false</code>
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with the absolute paths for all <code>package.json</code> files found within a directory.
  *
  * @callback pacscan~PackagePathsCallback
- * @param {string[]} filePaths -
+ * @param {string[]} filePaths - the paths to all available <code>package.json</code> files
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
 /**
- * TODO: Document
+ * Called with the file path and package information resolved from a file path.
  *
  * @callback pacscan~ResolvePackageCallback
- * @param {?string} filePath -
- * @param {?pacscan~Package} pkg -
+ * @param {?string} filePath - the path to the target file (may be <code>null</code> if it could not be resolved)
+ * @param {?pacscan~Package} pkg - the package information (may be <code>null</code> if it could not be resolved or the
+ * file does not belong to a package)
  * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The scan result.
  */
 
@@ -633,7 +636,11 @@ module.exports.version = version
  * The options to be used to scan for packages.
  *
  * @typedef {Object} pacscan~Options
- * @property {boolean} [includeParents] - TODO: Document
- * @property {knockknock~Options} [knockknock] - TODO: Document
- * @property {string} [path] - TODO: Document
+ * @property {boolean} [includeParents] - <code>true</code> if the highest level package directory should be scanned or
+ * <code>false</code> to scan only the initial base directory.
+ * @property {knockknock~Options} [knockknock] - The options to be passed to <code>knockknock</code> when attempting to
+ * determine the calling module (<code>limit</code> will always be overridden to <code>1</code>).
+ * @property {string} [path] - The path of the file/directory from which the base directory to be scanned is derived.
+ * The base directory should be derived from the module that was responsible for calling PacScan if this is
+ * <code>null</code>.
  */
