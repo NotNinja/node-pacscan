@@ -32,8 +32,25 @@ const version = require('../package.json').version
 
 // TODO: Add JSDoc
 
+/**
+ * A cache containing the available <code>package.json</code> file paths mapped to directory paths.
+ *
+ * The intention of this cache is to speed up available package lookups for repeat callers by avoiding file system
+ * searches.
+ *
+ * @private
+ * @type {Map.<string, pacscan~Package>}
+ */
 const availablePackagesCache = new Map()
 
+/**
+ * Scans for all available packages at either a given file/directory or at the module that called PacScan. It will find
+ * the base package for that file path and then find and extract simple information from all accessible
+ * <code>package.json</code> files, with the option to even find packages belonging to parent packages, where
+ * applicable.
+ *
+ * @private
+ */
 class PacScan {
 
   static _findPackagePaths(patterns, options, callback) {
@@ -69,6 +86,21 @@ class PacScan {
     return callback(filePaths)
   }
 
+  /**
+   * Returns the information for the package installed in the directory at the path provided.
+   *
+   * This information contains <code>dirPath</code> as well as the <code>name</code>, <code>version</code>, and
+   * (absolute) path of the <code>main</code> file (if any) read from the <code>package.json</code> file.
+   *
+   * This method should only be called when it is known that <code>dirPath</code> contains a <code>package.json</code>
+   * file.
+   *
+   * @param {string} dirPath - the path of the installation directory for the package whose information is to be
+   * returned
+   * @return {pacscan~Package} The information for the package installed within <code>dirPath</code>.
+   * @private
+   * @static
+   */
   static _getPackage(dirPath) {
     debug('Attempting to retrieve information for package installed in directory: %s', dirPath)
 
@@ -82,6 +114,15 @@ class PacScan {
     }
   }
 
+  /**
+   * Parses the optional input <code>options</code> provided, normalizing options and applying default values, where
+   * needed.
+   *
+   * @param {?pacscan~Options} options - the input options to be parsed (may be <code>null</code> if none were provided)
+   * @return {pacscan~Options} A new options object parsed from <code>options</code>.
+   * @private
+   * @static
+   */
   static _parseOptions(options) {
     if (!options) {
       options = {}
@@ -94,9 +135,31 @@ class PacScan {
     }
   }
 
+  /**
+   * Creates an instance of {@link PacScan} using the optional <code>options</code> provided.
+   *
+   * <code>sync</code> can be used to control whether package searches are performed synchronously or asynchronously.
+   *
+   * @param {boolean} sync - <code>true</code> if package searches should be synchronous or <code>false</code> if they
+   * should be asynchronous
+   * @param {pacscan~Options} [options] - the options to be used (may be <code>null</code>)
+   * @public
+   */
   constructor(sync, options) {
+    /**
+     * Whether package searches initiated by this {@link PacScan} should be made synchronously.
+     *
+     * @private
+     * @type {boolean}
+     */
     this._sync = sync
 
+    /**
+     * The parsed options for this {@link PacScan}.
+     *
+     * @private
+     * @type {pacscan~Options}
+     */
     this._options = PacScan._parseOptions(options)
   }
 
@@ -267,6 +330,16 @@ module.exports = function scan(options) {
   return Promise.resolve(new PacScan(false, options).scan())
 }
 
+/**
+ * Clears the cache containing available <code>package.json</code> file paths mapped to directory paths which is used to
+ * speed up package lookups for repeat callers by avoiding file system searches.
+ *
+ * This is primarily intended for testing purposes.
+ *
+ * @return {void}
+ * @protected
+ * @static
+ */
 module.exports.clearCache = function clearCache() {
   availablePackagesCache.clear()
 }
