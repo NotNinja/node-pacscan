@@ -33,7 +33,6 @@ const version = require('../package.json').version
 // TODO: Add JSDoc
 
 const availablePackagesCache = new Map()
-const packageCache = new Map()
 
 class PacScan {
 
@@ -71,23 +70,16 @@ class PacScan {
   }
 
   static _getPackage(dirPath) {
-    if (packageCache.has(dirPath)) {
-      return packageCache.get(dirPath)
-    }
-
     debug('Attempting to retrieve information for package installed in directory: %s', dirPath)
 
     const pkg = require(path.join(dirPath, 'package.json'))
-    const descriptor = {
+
+    return {
       directory: dirPath,
       main: pkg.main ? path.join(dirPath, pkg.main) : null,
       name: pkg.name,
       version: pkg.version
     }
-
-    packageCache.set(dirPath, descriptor)
-
-    return descriptor
   }
 
   static _parseOptions(options) {
@@ -277,7 +269,6 @@ module.exports = function scan(options) {
 
 module.exports.clearCache = function clearCache() {
   availablePackagesCache.clear()
-  packageCache.clear()
 }
 
 module.exports.sync = function scanSync(options) {
@@ -292,3 +283,23 @@ module.exports.sync = function scanSync(options) {
  * @type {string}
  */
 module.exports.version = version
+
+/**
+ * Contains some basic information for an individual package.
+ *
+ * @typedef {Object} pacscan~Package
+ * @property {string} directory - The path to the installation directory of the package.
+ * @property {?string} main - The path to the main file for the package (may be <code>null</code> if it has no
+ * <code>main</code> entry).
+ * @property {string} name - The name of the package.
+ * @property {string} version - The version of the package.
+ */
+
+/**
+ * The options to be used to scan for packages.
+ *
+ * @typedef {Object} pacscan~Options
+ * @property {boolean} [includeParents] - TODO: Document
+ * @property {knockknock~Options} [knockknock] - TODO: Document
+ * @property {string} [path] - TODO: Document
+ */
