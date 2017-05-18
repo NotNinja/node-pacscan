@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,22 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
 
 describe('pacscan:fixture:flat', () => {
-  before(() => helpers.copyFixture('flat'))
+  before(() => helpers.copyFixture('flat'));
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return promise for base package and its dependencies', () => {
-        const flat = helpers.requireFromFixture('flat', 'index.js')
+        const flat = helpers.requireFromFixture('flat', 'index.js');
 
         return flat()
           .then((packages) => {
@@ -82,13 +82,13 @@ describe('pacscan:fixture:flat', () => {
                 name: 'flat',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const flat = helpers.requireFromFixture('flat', 'index.js')
+          const flat = helpers.requireFromFixture('flat', 'index.js');
 
           return flat({ includeParents: true })
             .then((packages) => {
@@ -135,15 +135,15 @@ describe('pacscan:fixture:flat', () => {
                   name: 'flat',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return promise for dependency package only', () => {
-        const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js')
+        const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js');
 
         return foo()
           .then((packages) => {
@@ -154,13 +154,13 @@ describe('pacscan:fixture:flat', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js')
+          const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js');
 
           return foo({ includeParents: true })
             .then((packages) => {
@@ -207,15 +207,15 @@ describe('pacscan:fixture:flat', () => {
                   name: 'flat',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within scoped dependency package', () => {
       it('should return promise for scoped dependency package only', () => {
-        const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js')
+        const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js');
 
         return fizz()
           .then((packages) => {
@@ -226,13 +226,13 @@ describe('pacscan:fixture:flat', () => {
                 name: '@fu/fizz',
                 version: '1.3.1'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js')
+          const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js');
 
           return fizz({ includeParents: true })
             .then((packages) => {
@@ -279,20 +279,20 @@ describe('pacscan:fixture:flat', () => {
                   name: 'flat',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
-  })
+              ]);
+            });
+        });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return base package and its dependencies', () => {
-        const flat = helpers.requireFromFixture('flat', 'index.js')
-        const packages = flat.sync()
+        const flat = helpers.requireFromFixture('flat', 'index.js');
+        const packages = flat.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -337,13 +337,13 @@ describe('pacscan:fixture:flat', () => {
             name: 'flat',
             version: '1.0.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const flat = helpers.requireFromFixture('flat', 'index.js')
-          const packages = flat.sync({ includeParents: true })
+          const flat = helpers.requireFromFixture('flat', 'index.js');
+          const packages = flat.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -388,15 +388,15 @@ describe('pacscan:fixture:flat', () => {
               name: 'flat',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return dependency package only', () => {
-        const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js')
-        const packages = foo.sync()
+        const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js');
+        const packages = foo.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -405,13 +405,13 @@ describe('pacscan:fixture:flat', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js')
-          const packages = foo.sync({ includeParents: true })
+          const foo = helpers.requireFromFixture('flat', 'node_modules/foo/index.js');
+          const packages = foo.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -456,15 +456,15 @@ describe('pacscan:fixture:flat', () => {
               name: 'flat',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within scoped dependency package', () => {
       it('should return scoped dependency package only', () => {
-        const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js')
-        const packages = fizz.sync()
+        const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js');
+        const packages = fizz.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -473,13 +473,13 @@ describe('pacscan:fixture:flat', () => {
             name: '@fu/fizz',
             version: '1.3.1'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js')
-          const packages = fizz.sync({ includeParents: true })
+          const fizz = helpers.requireFromFixture('flat', 'node_modules/@fu/fizz/index.js');
+          const packages = fizz.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -524,9 +524,9 @@ describe('pacscan:fixture:flat', () => {
               name: 'flat',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
-  })
-})
+          ]);
+        });
+      });
+    });
+  });
+});

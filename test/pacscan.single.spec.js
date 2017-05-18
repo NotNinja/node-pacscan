@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,22 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
 
 describe('pacscan:fixture:single', () => {
-  before(() => helpers.copyFixture('single'))
+  before(() => helpers.copyFixture('single'));
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return promise for base package only', () => {
-        const single = helpers.requireFromFixture('single', 'index.js')
+        const single = helpers.requireFromFixture('single', 'index.js');
 
         return single()
           .then((packages) => {
@@ -46,14 +46,14 @@ describe('pacscan:fixture:single', () => {
                 name: 'single',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
-    })
+            ]);
+          });
+      });
+    });
 
     context('and "includeParents" is enabled', () => {
       it('should return promise for base package only', () => {
-        const single = helpers.requireFromFixture('single', 'index.js')
+        const single = helpers.requireFromFixture('single', 'index.js');
 
         return single({ includeParents: true })
           .then((packages) => {
@@ -64,19 +64,19 @@ describe('pacscan:fixture:single', () => {
                 name: 'single',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
-    })
-  })
+            ]);
+          });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return base package only', () => {
-        const single = helpers.requireFromFixture('single', 'index.js')
-        const packages = single.sync()
+        const single = helpers.requireFromFixture('single', 'index.js');
+        const packages = single.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -85,13 +85,13 @@ describe('pacscan:fixture:single', () => {
             name: 'single',
             version: '1.0.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package only', () => {
-          const single = helpers.requireFromFixture('single', 'index.js')
-          const packages = single.sync({ includeParents: true })
+          const single = helpers.requireFromFixture('single', 'index.js');
+          const packages = single.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -100,9 +100,9 @@ describe('pacscan:fixture:single', () => {
               name: 'single',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
-  })
-})
+          ]);
+        });
+      });
+    });
+  });
+});

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,22 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
 
 describe('pacscan:fixture:nested', () => {
-  before(() => helpers.copyFixture('nested'))
+  before(() => helpers.copyFixture('nested'));
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return promise for base package and its dependencies', () => {
-        const nested = helpers.requireFromFixture('nested', 'index.js')
+        const nested = helpers.requireFromFixture('nested', 'index.js');
 
         return nested()
           .then((packages) => {
@@ -82,13 +82,13 @@ describe('pacscan:fixture:nested', () => {
                 name: 'nested',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const nested = helpers.requireFromFixture('nested', 'index.js')
+          const nested = helpers.requireFromFixture('nested', 'index.js');
 
           return nested({ includeParents: true })
             .then((packages) => {
@@ -135,15 +135,15 @@ describe('pacscan:fixture:nested', () => {
                   name: 'nested',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return promise for dependency package and its dependencies only', () => {
-        const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js')
+        const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js');
 
         return foo()
           .then((packages) => {
@@ -184,13 +184,13 @@ describe('pacscan:fixture:nested', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js')
+          const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js');
 
           return foo({ includeParents: true })
             .then((packages) => {
@@ -237,15 +237,15 @@ describe('pacscan:fixture:nested', () => {
                   name: 'nested',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within nested dependency package', () => {
       it('should return promise for nested dependency package and its dependencies only', () => {
-        const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js')
+        const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js');
 
         return bar()
           .then((packages) => {
@@ -268,13 +268,13 @@ describe('pacscan:fixture:nested', () => {
                 name: 'bar',
                 version: '1.2.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js')
+          const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js');
 
           return bar({ includeParents: true })
             .then((packages) => {
@@ -321,15 +321,15 @@ describe('pacscan:fixture:nested', () => {
                   name: 'nested',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within scoped dependency package', () => {
       it('should return promise for scoped dependency package and its dependencies only', () => {
-        const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js')
+        const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js');
 
         return fizz()
           .then((packages) => {
@@ -346,13 +346,13 @@ describe('pacscan:fixture:nested', () => {
                 name: '@fu/fizz',
                 version: '1.3.1'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for base package and its dependencies', () => {
-          const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js')
+          const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js');
 
           return fizz({ includeParents: true })
             .then((packages) => {
@@ -399,20 +399,20 @@ describe('pacscan:fixture:nested', () => {
                   name: 'nested',
                   version: '1.0.0'
                 })
-              ])
-            })
-        })
-      })
-    })
-  })
+              ]);
+            });
+        });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base package', () => {
       it('should return base package and its dependencies', () => {
-        const nested = helpers.requireFromFixture('nested', 'index.js')
-        const packages = nested.sync()
+        const nested = helpers.requireFromFixture('nested', 'index.js');
+        const packages = nested.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -457,13 +457,13 @@ describe('pacscan:fixture:nested', () => {
             name: 'nested',
             version: '1.0.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const nested = helpers.requireFromFixture('nested', 'index.js')
-          const packages = nested.sync({ includeParents: true })
+          const nested = helpers.requireFromFixture('nested', 'index.js');
+          const packages = nested.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -508,15 +508,15 @@ describe('pacscan:fixture:nested', () => {
               name: 'nested',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return dependency package and its dependencies only', () => {
-        const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js')
-        const packages = foo.sync()
+        const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js');
+        const packages = foo.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -555,13 +555,13 @@ describe('pacscan:fixture:nested', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js')
-          const packages = foo.sync({ includeParents: true })
+          const foo = helpers.requireFromFixture('nested', 'node_modules/foo/index.js');
+          const packages = foo.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -606,15 +606,15 @@ describe('pacscan:fixture:nested', () => {
               name: 'nested',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within nested dependency package', () => {
       it('should return nested dependency package and its dependencies only', () => {
-        const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js')
-        const packages = bar.sync()
+        const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js');
+        const packages = bar.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -635,13 +635,13 @@ describe('pacscan:fixture:nested', () => {
             name: 'bar',
             version: '1.2.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js')
-          const packages = bar.sync({ includeParents: true })
+          const bar = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/bar/index.js');
+          const packages = bar.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -686,15 +686,15 @@ describe('pacscan:fixture:nested', () => {
               name: 'nested',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within scoped dependency package', () => {
       it('should return scoped dependency package and its dependencies only', () => {
-        const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js')
-        const packages = fizz.sync()
+        const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js');
+        const packages = fizz.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -709,13 +709,13 @@ describe('pacscan:fixture:nested', () => {
             name: '@fu/fizz',
             version: '1.3.1'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return base package and its dependencies', () => {
-          const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js')
-          const packages = fizz.sync({ includeParents: true })
+          const fizz = helpers.requireFromFixture('nested', 'node_modules/foo/node_modules/@fu/fizz/index.js');
+          const packages = fizz.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -760,9 +760,9 @@ describe('pacscan:fixture:nested', () => {
               name: 'nested',
               version: '1.0.0'
             })
-          ])
-        })
-      })
-    })
-  })
-})
+          ]);
+        });
+      });
+    });
+  });
+});

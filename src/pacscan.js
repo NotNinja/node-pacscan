@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,16 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const debug = require('debug')('pacscan')
-const fs = require('fs')
-const glob = require('glob')
-const path = require('path')
-const pkgDir = require('pkg-dir')
-const whoIsThere = require('knockknock')
+const debug = require('debug')('pacscan');
+const fs = require('fs');
+const glob = require('glob');
+const path = require('path');
+const pkgDir = require('pkg-dir');
+const whoIsThere = require('knockknock');
 
-const version = require('../package.json').version
+const version = require('../package.json').version;
 
 /**
  * A cache containing the available <code>package.json</code> file paths mapped to directory paths.
@@ -40,7 +40,7 @@ const version = require('../package.json').version
  * @private
  * @type {Map.<string, pacscan~Package>}
  */
-const availablePackagesCache = new Map()
+const availablePackagesCache = new Map();
 
 /**
  * Scans for all available packages at either a given file/directory or at the module that called PacScan. It will find
@@ -72,23 +72,23 @@ class PacScan {
       glob(pattern, options, (error, filePaths) => {
         /* istanbul ignore if */
         if (error) {
-          reject(error)
+          reject(error);
         } else {
-          resolve(filePaths)
+          resolve(filePaths);
         }
-      })
-    }))
+      });
+    }));
 
     return Promise.all(searches)
       .then((values) => {
-        let filePaths = []
+        let filePaths = [];
         values.forEach((value) => {
-          filePaths = filePaths.concat(value)
-        })
+          filePaths = filePaths.concat(value);
+        });
 
-        return filePaths
+        return filePaths;
       })
-      .then(callback)
+      .then(callback);
   }
 
   /**
@@ -107,12 +107,12 @@ class PacScan {
    * @static
    */
   static _findPackagePathsSync(patterns, options, callback) {
-    let filePaths = []
+    let filePaths = [];
     patterns.forEach((pattern) => {
-      filePaths = filePaths.concat(glob.sync(pattern, options))
-    })
+      filePaths = filePaths.concat(glob.sync(pattern, options));
+    });
 
-    return callback(filePaths)
+    return callback(filePaths);
   }
 
   /**
@@ -131,16 +131,16 @@ class PacScan {
    * @static
    */
   static _getPackage(dirPath) {
-    debug('Attempting to retrieve information for package installed in directory: %s', dirPath)
+    debug('Attempting to retrieve information for package installed in directory: %s', dirPath);
 
-    const pkg = require(path.join(dirPath, 'package.json'))
+    const pkg = require(path.join(dirPath, 'package.json'));
 
     return {
       directory: dirPath,
       main: pkg.main ? path.join(dirPath, pkg.main) : null,
       name: pkg.name,
       version: pkg.version
-    }
+    };
   }
 
   /**
@@ -154,14 +154,14 @@ class PacScan {
    */
   static _parseOptions(options) {
     if (!options) {
-      options = {}
+      options = {};
     }
 
     return {
       includeParents: options.includeParents,
       knockknock: options.knockknock,
       path: options.path
-    }
+    };
   }
 
   /**
@@ -181,7 +181,7 @@ class PacScan {
      * @private
      * @type {boolean}
      */
-    this._sync = sync
+    this._sync = sync;
 
     /**
      * The parsed options for this {@link PacScan}.
@@ -189,7 +189,7 @@ class PacScan {
      * @private
      * @type {pacscan~Options}
      */
-    this._options = PacScan._parseOptions(options)
+    this._options = PacScan._parseOptions(options);
   }
 
   /**
@@ -206,18 +206,18 @@ class PacScan {
    */
   scan() {
     return this._resolveBaseDirectory((dirPath) => {
-      debug('Scanning for available packages within directory: %s', dirPath)
+      debug('Scanning for available packages within directory: %s', dirPath);
 
       return this._findAvailablePackagePaths(dirPath, (filePaths) => {
-        debug('Found %d available packages within directory: %s', filePaths.length, dirPath)
+        debug('Found %d available packages within directory: %s', filePaths.length, dirPath);
 
         return filePaths.map((filePath) => {
-          const pkg = PacScan._getPackage(path.dirname(filePath))
+          const pkg = PacScan._getPackage(path.dirname(filePath));
 
-          return Object.assign({}, pkg)
-        })
-      })
-    })
+          return Object.assign({}, pkg);
+        });
+      });
+    });
   }
 
   /**
@@ -234,33 +234,33 @@ class PacScan {
    */
   _findAvailablePackagePaths(dirPath, callback) {
     if (availablePackagesCache.has(dirPath)) {
-      return callback(availablePackagesCache.get(dirPath))
+      return callback(availablePackagesCache.get(dirPath));
     }
 
-    debug('Attempting to find all packages files within directory: %s', dirPath)
+    debug('Attempting to find all packages files within directory: %s', dirPath);
 
-    const options = { cwd: dirPath, nodir: true, nosort: true }
+    const options = { cwd: dirPath, nodir: true, nosort: true };
     const patterns = [
       '**/node_modules/*/package.json',
       '**/node_modules/@*/*/package.json'
-    ]
-    const packagePathFinder = PacScan[this._sync ? '_findPackagePathsSync' : '_findPackagePaths']
+    ];
+    const packagePathFinder = PacScan[this._sync ? '_findPackagePathsSync' : '_findPackagePaths'];
 
     return packagePathFinder(patterns, options, (filePaths) => this._isPackageDirectory(dirPath, (isPackage) => {
       if (isPackage) {
-        filePaths.unshift('package.json')
+        filePaths.unshift('package.json');
       }
 
       filePaths = filePaths
         .sort()
-        .map((filePath) => path.join(dirPath, filePath))
+        .map((filePath) => path.join(dirPath, filePath));
 
-      availablePackagesCache.set(dirPath, filePaths)
+      availablePackagesCache.set(dirPath, filePaths);
 
-      debug('Found %d packages files within directory: %s', filePaths.length, dirPath)
+      debug('Found %d packages files within directory: %s', filePaths.length, dirPath);
 
-      return callback(filePaths)
-    }))
+      return callback(filePaths);
+    }));
   }
 
   /**
@@ -281,29 +281,29 @@ class PacScan {
   _findBaseDirectory(filePath, callback) {
     return this._findPackageDirectory(filePath, (dirPath) => {
       if (dirPath == null) {
-        return callback(null)
+        return callback(null);
       }
 
-      let parentDirPath = path.dirname(dirPath)
-      let parentDirName = path.basename(parentDirPath)
+      let parentDirPath = path.dirname(dirPath);
+      let parentDirName = path.basename(parentDirPath);
 
       if (parentDirName.charAt(0) === '@') {
-        parentDirPath = path.dirname(parentDirPath)
-        parentDirName = path.basename(parentDirPath)
+        parentDirPath = path.dirname(parentDirPath);
+        parentDirName = path.basename(parentDirPath);
       }
 
       if (parentDirName === 'node_modules') {
         return this._findBaseDirectory(parentDirPath, (parentPkgDirPath) => {
           if (parentPkgDirPath != null) {
-            dirPath = parentPkgDirPath
+            dirPath = parentPkgDirPath;
           }
 
-          return callback(dirPath)
-        })
+          return callback(dirPath);
+        });
       }
 
-      return callback(dirPath)
-    })
+      return callback(dirPath);
+    });
   }
 
   /**
@@ -320,18 +320,18 @@ class PacScan {
    * @private
    */
   _findCaller(callback) {
-    const excludes = [ 'pacscan' ]
-    const options = Object.assign({}, this._options.knockknock, { limit: 1 })
+    const excludes = [ 'pacscan' ];
+    const options = Object.assign({}, this._options.knockknock, { limit: 1 });
 
-    options.excludes = options.excludes ? excludes.concat(options.excludes) : excludes
+    options.excludes = options.excludes ? excludes.concat(options.excludes) : excludes;
 
     if (this._sync) {
-      return callback(whoIsThere.sync(options)[0])
+      return callback(whoIsThere.sync(options)[0]);
     }
 
     return whoIsThere(options)
       .then((callers) => callers[0])
-      .then(callback)
+      .then(callback);
   }
 
   /**
@@ -349,10 +349,10 @@ class PacScan {
    */
   _findPackageDirectory(filePath, callback) {
     if (this._sync) {
-      return callback(pkgDir.sync(filePath))
+      return callback(pkgDir.sync(filePath));
     }
 
-    return pkgDir(filePath).then(callback)
+    return pkgDir(filePath).then(callback);
   }
 
   /**
@@ -366,20 +366,20 @@ class PacScan {
    */
   _isDirectory(filePath, callback) {
     if (this._sync) {
-      return callback(fs.statSync(filePath).isDirectory())
+      return callback(fs.statSync(filePath).isDirectory());
     }
 
     return new Promise((resolve, reject) => {
       fs.stat(filePath, (error, stats) => {
         /* istanbul ignore if */
         if (error) {
-          reject(error)
+          reject(error);
         } else {
-          resolve(stats.isDirectory())
+          resolve(stats.isDirectory());
         }
-      })
+      });
     })
-    .then(callback)
+    .then(callback);
   }
 
   /**
@@ -392,7 +392,7 @@ class PacScan {
    * @private
    */
   _isPackageDirectory(filePath, callback) {
-    return this._findPackageDirectory(filePath, (dirPath) => callback(filePath === dirPath))
+    return this._findPackageDirectory(filePath, (dirPath) => callback(filePath === dirPath));
   }
 
   /**
@@ -414,42 +414,42 @@ class PacScan {
    * @private
    */
   _resolveBaseDirectory(callback) {
-    let packageResolver
+    let packageResolver;
     if (this._options.path != null) {
-      packageResolver = this._resolvePackageFromPath.bind(this)
+      packageResolver = this._resolvePackageFromPath.bind(this);
     } else {
-      packageResolver = this._resolvePackageFromCaller.bind(this)
+      packageResolver = this._resolvePackageFromCaller.bind(this);
     }
 
     return packageResolver((filePath, pkg) => {
       if (filePath == null) {
-        throw new Error('Could not resolve base directory as file was missing')
+        throw new Error('Could not resolve base directory as file was missing');
       }
 
       if (pkg == null) {
         return this._isDirectory(filePath, (isDirectory) => {
-          const dirPath = isDirectory ? filePath : path.dirname(filePath)
+          const dirPath = isDirectory ? filePath : path.dirname(filePath);
 
-          debug('Unable to find package containing file "%s" so using directory as base: %s', filePath, dirPath)
+          debug('Unable to find package containing file "%s" so using directory as base: %s', filePath, dirPath);
 
-          return callback(dirPath)
-        })
+          return callback(dirPath);
+        });
       }
 
-      const dirPath = pkg.directory
+      const dirPath = pkg.directory;
 
-      debug('Found package "%s" containing file: %s', pkg.name, filePath)
+      debug('Found package "%s" containing file: %s', pkg.name, filePath);
 
       if (!this._options.includeParents) {
-        debug('Using installation directory for package containing file as base: %s', dirPath)
+        debug('Using installation directory for package containing file as base: %s', dirPath);
 
-        return callback(dirPath)
+        return callback(dirPath);
       }
 
-      debug('Attempting to find base parent package installation directory from package "%s" to use as base', pkg.name)
+      debug('Attempting to find base parent package installation directory from package "%s" to use as base', pkg.name);
 
-      return this._findBaseDirectory(dirPath, callback)
-    })
+      return this._findBaseDirectory(dirPath, callback);
+    });
   }
 
   /**
@@ -467,11 +467,11 @@ class PacScan {
   _resolvePackageFromCaller(callback) {
     return this._findCaller((caller) => {
       if (caller == null) {
-        return callback(null, null)
+        return callback(null, null);
       }
 
-      return callback(caller.file, caller.package)
-    })
+      return callback(caller.file, caller.package);
+    });
   }
 
   /**
@@ -486,13 +486,13 @@ class PacScan {
    * @private
    */
   _resolvePackageFromPath(callback) {
-    const filePath = this._options.path
+    const filePath = this._options.path;
 
     return this._findPackageDirectory(filePath, (dirPath) => {
-      const pkg = dirPath != null ? PacScan._getPackage(dirPath) : null
+      const pkg = dirPath != null ? PacScan._getPackage(dirPath) : null;
 
-      return callback(filePath, pkg)
-    })
+      return callback(filePath, pkg);
+    });
   }
 
 }
@@ -515,8 +515,8 @@ class PacScan {
  * @static
  */
 module.exports = function scan(options) {
-  return Promise.resolve(new PacScan(false, options).scan())
-}
+  return Promise.resolve(new PacScan(false, options).scan());
+};
 
 /**
  * Clears the cache containing available <code>package.json</code> file paths mapped to directory paths which is used to
@@ -529,8 +529,8 @@ module.exports = function scan(options) {
  * @static
  */
 module.exports.clearCache = function clearCache() {
-  availablePackagesCache.clear()
-}
+  availablePackagesCache.clear();
+};
 
 /**
  * Synchronously resolves the base directory from either the <code>path</code> option or the module that was responsible
@@ -548,9 +548,9 @@ module.exports.clearCache = function clearCache() {
  * @public
  * @static
  */
-module.exports.sync = function scanSync(options) {
-  return new PacScan(true, options).scan()
-}
+module.exports.sync = function sync(options) {
+  return new PacScan(true, options).scan();
+};
 
 /**
  * The current version of PacScan.
@@ -559,7 +559,7 @@ module.exports.sync = function scanSync(options) {
  * @static
  * @type {string}
  */
-module.exports.version = version
+module.exports.version = version;
 
 /**
  * Called with the path of a base directory.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,61 +20,61 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
 
 describe('pacscan:fixture:unpackaged-single', () => {
-  before(() => helpers.copyFixture('unpackaged-single'))
+  before(() => helpers.copyFixture('unpackaged-single'));
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base directory', () => {
       it('should return promise for empty array', () => {
-        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js')
+        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js');
 
         return unpackagedSingle()
           .then((packages) => {
-            expect(packages).to.be.empty
-          })
-      })
-    })
+            expect(packages).to.be.empty;
+          });
+      });
+    });
 
     context('and "includeParents" is enabled', () => {
       it('should return promise for empty array', () => {
-        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js')
+        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js');
 
         return unpackagedSingle({ includeParents: true })
           .then((packages) => {
-            expect(packages).to.be.empty
-          })
-      })
-    })
-  })
+            expect(packages).to.be.empty;
+          });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base directory', () => {
       it('should return empty array', () => {
-        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js')
-        const packages = unpackagedSingle.sync()
+        const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js');
+        const packages = unpackagedSingle.sync();
 
-        expect(packages).to.be.empty
-      })
+        expect(packages).to.be.empty;
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return empty array', () => {
-          const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js')
-          const packages = unpackagedSingle.sync({ includeParents: true })
+          const unpackagedSingle = helpers.requireFromFixture('unpackaged-single', 'index.js');
+          const packages = unpackagedSingle.sync({ includeParents: true });
 
-          expect(packages).to.be.empty
-        })
-      })
-    })
-  })
-})
+          expect(packages).to.be.empty;
+        });
+      });
+    });
+  });
+});

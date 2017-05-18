@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,22 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
 
 describe('pacscan:fixture:unpackaged', () => {
-  before(() => helpers.copyFixture('unpackaged'))
+  before(() => helpers.copyFixture('unpackaged'));
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base directory', () => {
       it('should return promise for dependencies only', () => {
-        const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js')
+        const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js');
 
         return unpackaged()
           .then((packages) => {
@@ -52,13 +52,13 @@ describe('pacscan:fixture:unpackaged', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for dependencies only', () => {
-          const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js')
+          const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js');
 
           return unpackaged({ includeParents: true })
             .then((packages) => {
@@ -75,15 +75,15 @@ describe('pacscan:fixture:unpackaged', () => {
                   name: 'foo',
                   version: '1.1.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return promise for dependencies only', () => {
-        const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js')
+        const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js');
 
         return foo()
           .then((packages) => {
@@ -100,13 +100,13 @@ describe('pacscan:fixture:unpackaged', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for dependencies only', () => {
-          const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js')
+          const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js');
 
           return foo({ includeParents: true })
             .then((packages) => {
@@ -123,15 +123,15 @@ describe('pacscan:fixture:unpackaged', () => {
                   name: 'foo',
                   version: '1.1.0'
                 })
-              ])
-            })
-        })
-      })
-    })
+              ]);
+            });
+        });
+      });
+    });
 
     context('and called from within nested dependency package', () => {
       it('should return promise for nested dependency package only', () => {
-        const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js')
+        const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js');
 
         return bar()
           .then((packages) => {
@@ -142,13 +142,13 @@ describe('pacscan:fixture:unpackaged', () => {
                 name: 'bar',
                 version: '1.2.0'
               })
-            ])
-          })
-      })
+            ]);
+          });
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return promise for dependencies only', () => {
-          const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js')
+          const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js');
 
           return bar({ includeParents: true })
             .then((packages) => {
@@ -165,20 +165,20 @@ describe('pacscan:fixture:unpackaged', () => {
                   name: 'foo',
                   version: '1.1.0'
                 })
-              ])
-            })
-        })
-      })
-    })
-  })
+              ]);
+            });
+        });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from within base directory', () => {
       it('should return dependencies only', () => {
-        const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js')
-        const packages = unpackaged.sync()
+        const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js');
+        const packages = unpackaged.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -193,13 +193,13 @@ describe('pacscan:fixture:unpackaged', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return dependencies only', () => {
-          const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js')
-          const packages = unpackaged.sync({ includeParents: true })
+          const unpackaged = helpers.requireFromFixture('unpackaged', 'index.js');
+          const packages = unpackaged.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -214,15 +214,15 @@ describe('pacscan:fixture:unpackaged', () => {
               name: 'foo',
               version: '1.1.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within dependency package', () => {
       it('should return dependencies only', () => {
-        const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js')
-        const packages = foo.sync()
+        const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js');
+        const packages = foo.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -237,13 +237,13 @@ describe('pacscan:fixture:unpackaged', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return dependencies only', () => {
-          const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js')
-          const packages = foo.sync({ includeParents: true })
+          const foo = helpers.requireFromFixture('unpackaged', 'node_modules/foo/index.js');
+          const packages = foo.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -258,15 +258,15 @@ describe('pacscan:fixture:unpackaged', () => {
               name: 'foo',
               version: '1.1.0'
             })
-          ])
-        })
-      })
-    })
+          ]);
+        });
+      });
+    });
 
     context('and called from within nested dependency package', () => {
       it('should return nested dependency package only', () => {
-        const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js')
-        const packages = bar.sync()
+        const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js');
+        const packages = bar.sync();
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -275,13 +275,13 @@ describe('pacscan:fixture:unpackaged', () => {
             name: 'bar',
             version: '1.2.0'
           })
-        ])
-      })
+        ]);
+      });
 
       context('and "includeParents" is enabled', () => {
         it('should return dependencies only', () => {
-          const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js')
-          const packages = bar.sync({ includeParents: true })
+          const bar = helpers.requireFromFixture('unpackaged', 'node_modules/foo/node_modules/bar/index.js');
+          const packages = bar.sync({ includeParents: true });
 
           expect(packages).to.eql([
             helpers.resolvePackageForFixture({
@@ -296,9 +296,9 @@ describe('pacscan:fixture:unpackaged', () => {
               name: 'foo',
               version: '1.1.0'
             })
-          ])
-        })
-      })
-    })
-  })
-})
+          ]);
+        });
+      });
+    });
+  });
+});
