@@ -103,7 +103,7 @@ The current version of PacScan.
 const pacscan = require('pacscan');
 
 pacscan.version;
-=> "0.1.0"
+=> "0.2.0"
 ```
 
 ## Bugs

@@ -1,6 +1,6 @@
 {
   "name": "pacscan",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scans for available packages",
   "homepage": "https://github.com/NotNinja/node-pacscan",
   "bugs": {
