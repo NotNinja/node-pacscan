@@ -43,6 +43,17 @@ const version = require('../package.json').version;
 const availablePackagesCache = new Map();
 
 /**
+ * A cache containing the parent package directories mapped to child directory paths.
+ *
+ * The intention of this cache is to speed up parent package directory lookups for repeat callers by avoiding file
+ * system traversals.
+ *
+ * @private
+ * @type {Map.<string, string>}
+ */
+const parentPackageDirectoriesCache = new Map();
+
+/**
  * Scans for all available packages at either a given file/directory or at the module that called PacScan. It will find
  * the base package for that file path and then find and extract simple information from all accessible
  * <code>package.json</code> files, with the option to even find packages belonging to parent packages, where
@@ -264,7 +275,7 @@ class PacScan {
   }
 
   /**
-   * Finds the base directory from the specified <code>filePath</code> and passes the path to the base directory to the
+   * Finds the base directory from the specified <code>dirPath</code> and passes the path to the base directory to the
    * <code>callback</code> function.
    *
    * The base directory is basically the highest level package directory. This is determined by finding package
@@ -273,18 +284,22 @@ class PacScan {
    *
    * This method should only be called when the <code>includeParents</code> option is enabled.
    *
-   * @param {string} filePath - the file path from where the base directory should be found
+   * @param {string} dirPath - the directory path from where the base directory should be found
    * @param {pacscan~BaseDirectoryCallback} callback - the function to be called with the path to the base directory
    * @return {pacscan~Package[]|Promise.<Error, pacscan~Package[]>} The result of calling <code>callback</code>.
    * @private
    */
-  _findBaseDirectory(filePath, callback) {
-    return this._findPackageDirectory(filePath, (dirPath) => {
-      if (dirPath == null) {
+  _findBaseDirectory(dirPath, callback) {
+    if (parentPackageDirectoriesCache.has(dirPath)) {
+      return callback(parentPackageDirectoriesCache.get(dirPath));
+    }
+
+    return this._findPackageDirectory(dirPath, (childDirPath) => {
+      if (childDirPath == null) {
         return callback(null);
       }
 
-      let parentDirPath = path.dirname(dirPath);
+      let parentDirPath = path.dirname(childDirPath);
       let parentDirName = path.basename(parentDirPath);
 
       if (parentDirName.charAt(0) === '@') {
@@ -295,14 +310,16 @@ class PacScan {
       if (parentDirName === 'node_modules') {
         return this._findBaseDirectory(parentDirPath, (parentPkgDirPath) => {
           if (parentPkgDirPath != null) {
-            dirPath = parentPkgDirPath;
+            childDirPath = parentPkgDirPath;
           }
 
-          return callback(dirPath);
+          return callback(childDirPath);
         });
       }
 
-      return callback(dirPath);
+      parentPackageDirectoriesCache.set(dirPath, childDirPath);
+
+      return callback(childDirPath);
     });
   }
 
@@ -519,8 +536,9 @@ module.exports = function scan(options) {
 };
 
 /**
- * Clears the cache containing available <code>package.json</code> file paths mapped to directory paths which is used to
- * speed up package lookups for repeat callers by avoiding file system searches.
+ * Clears the caches containing available <code>package.json</code> file paths and parent package directories mapped to
+ * directory paths which is used to speed up package lookups for repeat callers by avoiding file system searches and
+ * traversals.
  *
  * This is primarily intended for testing purposes.
  *
@@ -530,6 +548,7 @@ module.exports = function scan(options) {
  */
 module.exports.clearCache = function clearCache() {
   availablePackagesCache.clear();
+  parentPackageDirectoriesCache.clear();
 };
 
 /**
