@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "coveralls": "^2.13.1",
+    "codecov": "^2.2.0",
     "eslint": "^3.19.0",
     "eslint-config-notninja": "^0.1.1",
     "istanbul": "^0.4.5",
@@ -41,7 +41,7 @@
   "main": "src/pacscan.js",
   "scripts": {
     "ci": "npm run test",
-    "report-coverage": "istanbul cover _mocha --report lcovonly -- -R list \"test/**/*.spec.js\" && coveralls < coverage/lcov.info",
+    "report-coverage": "istanbul cover _mocha --report lcovonly -- -R list \"test/**/*.spec.js\" && codecov",
     "pretest": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "test": "istanbul cover _mocha -- -R list \"test/**/*.spec.js\"",
     "posttest": "istanbul check-coverage"

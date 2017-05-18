@@ -11,7 +11,7 @@
 runtime by scanning `node_modules` as opposed to digging into dependency trees.
 
 [![Build](https://img.shields.io/travis/NotNinja/node-pacscan/develop.svg?style=flat-square)](https://travis-ci.org/NotNinja/node-pacscan)
-[![Coverage](https://img.shields.io/coveralls/NotNinja/node-pacscan/develop.svg?style=flat-square)](https://coveralls.io/github/NotNinja/node-pacscan)
+[![Coverage](https://img.shields.io/codecov/c/github/NotNinja/node-pacscan/develop.svg?style=flat-square)](https://codecov.io/gh/NotNinja/node-pacscan)
 [![Dependencies](https://img.shields.io/david/NotNinja/node-pacscan.svg?style=flat-square)](https://david-dm.org/NotNinja/node-pacscan)
 [![Dev Dependencies](https://img.shields.io/david/dev/NotNinja/node-pacscan.svg?style=flat-square)](https://david-dm.org/NotNinja/node-pacscan?type=dev)
 [![License](https://img.shields.io/npm/l/pacscan.svg?style=flat-square)](https://github.com/NotNinja/node-pacscan/blob/master/LICENSE.md)
