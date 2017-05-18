@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alasdair Mercer, Skelp
+ * Copyright (C) 2017 Alasdair Mercer, !ninja
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,50 +20,50 @@
  * SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
-const helpers = require('./helpers')
-const pacscan = require('../src/pacscan')
-const version = require('../package.json').version
+const helpers = require('./helpers');
+const pacscan = require('../src/pacscan');
+const version = require('../package.json').version;
 
 describe('pacscan', () => {
   before(() => {
     return Promise.all([
       helpers.copyFixture('flat'),
       helpers.copyFixture('unpackaged')
-    ])
-  })
+    ]);
+  });
 
   context('when asynchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from unknown source without "path"', () => {
       it('should return promise rejected', () => {
         return pacscan(helpers.createOptions())
           .then(() => {
-            throw new Error('Expected promise to be rejected')
+            throw new Error('Expected promise to be rejected');
           })
           .catch((error) => {
-            expect(error.message).to.equal('Could not resolve base directory as file was missing')
-          })
-      })
-    })
+            expect(error.message).to.equal('Could not resolve base directory as file was missing');
+          });
+      });
+    });
 
     context('and no options are provided', () => {
       it('should use default options', () => {
         return pacscan()
           .then((packages) => {
             // mocha modules are only excluded by helpers.createOptions, so will now be included
-            expect(packages).to.have.length.of.at.least(1)
-          })
-      })
-    })
+            expect(packages).to.have.length.of.at.least(1);
+          });
+      });
+    });
 
     context('and "path" targets package directory', () => {
       it('should return promise for package and its dependencies', () => {
-        const dirPath = helpers.getFixtureDirectory('flat')
+        const dirPath = helpers.getFixtureDirectory('flat');
 
         return pacscan(helpers.createOptions({ path: dirPath }))
           .then((packages) => {
@@ -110,14 +110,14 @@ describe('pacscan', () => {
                 name: 'flat',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
-    })
+            ]);
+          });
+      });
+    });
 
     context('and "path" targets packaged file', () => {
       it('should return promise for package and its dependencies', () => {
-        const filePath = helpers.resolveFixtureFile('flat', 'index.js')
+        const filePath = helpers.resolveFixtureFile('flat', 'index.js');
 
         return pacscan(helpers.createOptions({ path: filePath }))
           .then((packages) => {
@@ -164,14 +164,14 @@ describe('pacscan', () => {
                 name: 'flat',
                 version: '1.0.0'
               })
-            ])
-          })
-      })
-    })
+            ]);
+          });
+      });
+    });
 
     context('and "path" targets unpackaged directory', () => {
       it('should return promise for dependencies only', () => {
-        const dirPath = helpers.getFixtureDirectory('unpackaged')
+        const dirPath = helpers.getFixtureDirectory('unpackaged');
 
         return pacscan(helpers.createOptions({ path: dirPath }))
           .then((packages) => {
@@ -188,14 +188,14 @@ describe('pacscan', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
-    })
+            ]);
+          });
+      });
+    });
 
     context('and "path" targets unpackaged file', () => {
       it('should return promise for dependencies only', () => {
-        const filePath = helpers.resolveFixtureFile('unpackaged', 'index.js')
+        const filePath = helpers.resolveFixtureFile('unpackaged', 'index.js');
 
         return pacscan(helpers.createOptions({ path: filePath }))
           .then((packages) => {
@@ -212,36 +212,36 @@ describe('pacscan', () => {
                 name: 'foo',
                 version: '1.1.0'
               })
-            ])
-          })
-      })
-    })
-  })
+            ]);
+          });
+      });
+    });
+  });
 
   context('when synchronous', () => {
-    before(() => pacscan.clearCache())
+    before(() => pacscan.clearCache());
 
     context('and called from unknown source without "path"', () => {
       it('should throw error', () => {
         expect(() => {
-          pacscan.sync(helpers.createOptions())
-        }).to.throw(Error, 'Could not resolve base directory as file was missing')
-      })
-    })
+          pacscan.sync(helpers.createOptions());
+        }).to.throw(Error, 'Could not resolve base directory as file was missing');
+      });
+    });
 
     context('and no options are provided', () => {
       it('should use default options', () => {
-        const packages = pacscan.sync()
+        const packages = pacscan.sync();
 
         // mocha modules are only excluded by helpers.createOptions, so will now be included
-        expect(packages).to.have.length.of.at.least(1)
-      })
-    })
+        expect(packages).to.have.length.of.at.least(1);
+      });
+    });
 
     context('and "path" targets package directory', () => {
       it('should return package and its dependencies', () => {
-        const dirPath = helpers.getFixtureDirectory('flat')
-        const packages = pacscan.sync(helpers.createOptions({ path: dirPath }))
+        const dirPath = helpers.getFixtureDirectory('flat');
+        const packages = pacscan.sync(helpers.createOptions({ path: dirPath }));
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -286,14 +286,14 @@ describe('pacscan', () => {
             name: 'flat',
             version: '1.0.0'
           })
-        ])
-      })
-    })
+        ]);
+      });
+    });
 
     context('and "path" targets packaged file', () => {
       it('should return package and its dependencies', () => {
-        const filePath = helpers.resolveFixtureFile('flat', 'index.js')
-        const packages = pacscan.sync(helpers.createOptions({ path: filePath }))
+        const filePath = helpers.resolveFixtureFile('flat', 'index.js');
+        const packages = pacscan.sync(helpers.createOptions({ path: filePath }));
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -338,14 +338,14 @@ describe('pacscan', () => {
             name: 'flat',
             version: '1.0.0'
           })
-        ])
-      })
-    })
+        ]);
+      });
+    });
 
     context('and "path" targets unpackaged directory', () => {
       it('should return dependencies only', () => {
-        const dirPath = helpers.getFixtureDirectory('unpackaged')
-        const packages = pacscan.sync(helpers.createOptions({ path: dirPath }))
+        const dirPath = helpers.getFixtureDirectory('unpackaged');
+        const packages = pacscan.sync(helpers.createOptions({ path: dirPath }));
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -360,14 +360,14 @@ describe('pacscan', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
-    })
+        ]);
+      });
+    });
 
     context('and "path" targets unpackaged file', () => {
       it('should return dependencies only', () => {
-        const filePath = helpers.resolveFixtureFile('unpackaged', 'index.js')
-        const packages = pacscan.sync(helpers.createOptions({ path: filePath }))
+        const filePath = helpers.resolveFixtureFile('unpackaged', 'index.js');
+        const packages = pacscan.sync(helpers.createOptions({ path: filePath }));
 
         expect(packages).to.eql([
           helpers.resolvePackageForFixture({
@@ -382,14 +382,14 @@ describe('pacscan', () => {
             name: 'foo',
             version: '1.1.0'
           })
-        ])
-      })
-    })
-  })
+        ]);
+      });
+    });
+  });
 
   describe('.version', () => {
     it('should match package version', () => {
-      expect(pacscan.version).to.equal(version)
-    })
-  })
-})
+      expect(pacscan.version).to.equal(version);
+    });
+  });
+});

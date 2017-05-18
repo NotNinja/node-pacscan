@@ -7,14 +7,14 @@
     888       888  888 Y88b.   Y88b  d88P Y88b.    888  888 888  888
     888       "Y888888  "Y8888P "Y8888P"   "Y8888P "Y888888 888  888
 
-[PacScan](https://github.com/Skelp/node-pacscan) provides information about all available packages for your module at
+[PacScan](https://github.com/NotNinja/node-pacscan) provides information about all available packages for your module at
 runtime by scanning `node_modules` as opposed to digging into dependency trees.
 
-[![Build](https://img.shields.io/travis/Skelp/node-pacscan/develop.svg?style=flat-square)](https://travis-ci.org/Skelp/node-pacscan)
-[![Coverage](https://img.shields.io/coveralls/Skelp/node-pacscan/develop.svg?style=flat-square)](https://coveralls.io/github/Skelp/node-pacscan)
-[![Dependencies](https://img.shields.io/david/Skelp/node-pacscan.svg?style=flat-square)](https://david-dm.org/Skelp/node-pacscan)
-[![Dev Dependencies](https://img.shields.io/david/dev/Skelp/node-pacscan.svg?style=flat-square)](https://david-dm.org/Skelp/node-pacscan#info=devDependencies)
-[![License](https://img.shields.io/npm/l/pacscan.svg?style=flat-square)](https://github.com/Skelp/node-pacscan/blob/master/LICENSE.md)
+[![Build](https://img.shields.io/travis/NotNinja/node-pacscan/develop.svg?style=flat-square)](https://travis-ci.org/NotNinja/node-pacscan)
+[![Coverage](https://img.shields.io/codecov/c/github/NotNinja/node-pacscan/develop.svg?style=flat-square)](https://codecov.io/gh/NotNinja/node-pacscan)
+[![Dependencies](https://img.shields.io/david/NotNinja/node-pacscan.svg?style=flat-square)](https://david-dm.org/NotNinja/node-pacscan)
+[![Dev Dependencies](https://img.shields.io/david/dev/NotNinja/node-pacscan.svg?style=flat-square)](https://david-dm.org/NotNinja/node-pacscan?type=dev)
+[![License](https://img.shields.io/npm/l/pacscan.svg?style=flat-square)](https://github.com/NotNinja/node-pacscan/blob/master/LICENSE.md)
 [![Release](https://img.shields.io/npm/v/pacscan.svg?style=flat-square)](https://www.npmjs.com/package/pacscan)
 
 * [Install](#install)
@@ -56,22 +56,22 @@ The `options` parameter is entirely optional and supports the following:
 | Option           | Description                                                                                                                               | Default Value |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | `includeParents` | Whether the highest level package directory should be scanned or only the lowest level base directory.                                      | `false` |
-| `knockknock`     | Any options to be passed to [KnockKnock](https://github.com/Skelp/node-knockknock). `limit` will always be overridden to `1`.               | `null`  |
+| `knockknock`     | Any options to be passed to [KnockKnock](https://github.com/NotNinja/node-knockknock). `limit` will always be overridden to `1`.            | `null`  |
 | `path`           | The file/directory path from where to derive the base directory to be scanned. Path to module that called PacScan will be used when `null`. | `null`  |
 
 If you only want to list the packages available to your module/package:
 
 ``` javascript
-const pacscan = require('pacscan')
+const pacscan = require('pacscan');
 
 module.exports = function() {
   pacscan()
     .then((packages) => {
-      console.log(`${packages.length} packages found`)
+      console.log(`${packages.length} packages found`);
 
       // ...
-    })
-}
+    });
+};
 ```
 
 However, if you're calling PacScan from within a library that is most likely being included in another package as a
@@ -84,15 +84,15 @@ option.
 A synchronous alternative to `pacscan([options])`.
 
 ``` javascript
-const pacscan = require('pacscan')
+const pacscan = require('pacscan');
 
 module.exports = function() {
-  const packages = pacscan.sync()
+  const packages = pacscan.sync();
 
-  console.log(`${packages.length} packages found`)
+  console.log(`${packages.length} packages found`);
 
   // ...
-}
+};
 ```
 
 ### `pacscan.version`
@@ -100,29 +100,29 @@ module.exports = function() {
 The current version of PacScan.
 
 ``` javascript
-const pacscan = require('pacscan')
+const pacscan = require('pacscan');
 
-pacscan.version
-=> "0.1.0"
+pacscan.version;
+=> "0.2.0"
 ```
 
 ## Bugs
 
 If you have any problems with PacScan or would like to see changes currently in development you can do so
-[here](https://github.com/Skelp/node-pacscan/issues).
+[here](https://github.com/NotNinja/node-pacscan/issues).
 
 ## Contributors
 
 If you want to contribute, you're a legend! Information on how you can do so can be found in
-[CONTRIBUTING.md](https://github.com/Skelp/node-pacscan/blob/master/CONTRIBUTING.md). We want your suggestions and pull
-requests!
+[CONTRIBUTING.md](https://github.com/NotNinja/node-pacscan/blob/master/CONTRIBUTING.md). We want your suggestions and
+pull requests!
 
 A list of PacScan contributors can be found in
-[AUTHORS.md](https://github.com/Skelp/node-pacscan/blob/master/AUTHORS.md).
+[AUTHORS.md](https://github.com/NotNinja/node-pacscan/blob/master/AUTHORS.md).
 
 ## License
 
-See [LICENSE.md](https://github.com/Skelp/node-pacscan/raw/master/LICENSE.md) for more information on our MIT license.
+See [LICENSE.md](https://github.com/NotNinja/node-pacscan/raw/master/LICENSE.md) for more information on our MIT
+license.
 
-© 2017 [Skelp](https://skelp.io)
-<img align="right" width="16" height="16" src="https://cdn.rawgit.com/Skelp/skelp-branding/master/assets/logo/base/skelp-logo-16x16.png">
+[![Copyright !ninja](https://cdn.rawgit.com/NotNinja/branding/master/assets/copyright/base/not-ninja-copyright-186x25.png)](https://not.ninja)
